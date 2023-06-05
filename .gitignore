@@ -1,3 +1,4 @@
 api_keys.py
 .vscode/settings.json
 __pycache__/api_keys.cpython-311.pyc
+*.png
