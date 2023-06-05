@@ -1,6 +1,8 @@
 import requests
 from api_keys import realtime_apikey, forecast_apikey
 import pprint
+import urllib.request
+from PIL import Image
 
 pp = pprint.PrettyPrinter(compact=True)
 
@@ -48,4 +50,6 @@ for key,value in forecast_response.items():
             print(day[0].keys())
             for inner_key,info in day[0].items():
                 if inner_key == 'day':
-                    pp.pprint(info)
+                    urllib.request.urlretrieve(('http:'+info['condition']['icon']),'weathericon.png')
+                    img = Image.open('weathericon.png')
+                    img.show()
