@@ -66,6 +66,7 @@ def forecast_api_call() -> dict:
     day_1_avgtemp_f = response['forecast']['forecastday'][1]['day']['avgtemp_f']
     day_1_condition_dict = response['forecast']['forecastday'][1]['day']['condition']
     day_1_avghumidity = response['forecast']['forecastday'][1]['day']['avghumidity']
+    day_1_date = response['forecast']['forecastday'][1]['date']
     #print(day_1_maxtemp_f,day_1_mintemp_f,day_1_avgtemp_f,day_1_condition_dict,day_1_avghumidity)
 
     day_2_maxtemp_f = response['forecast']['forecastday'][2]['day']['maxtemp_f']
@@ -73,6 +74,7 @@ def forecast_api_call() -> dict:
     day_2_avgtemp_f = response['forecast']['forecastday'][2]['day']['avgtemp_f']
     day_2_condition_dict = response['forecast']['forecastday'][2]['day']['condition']
     day_2_avghumidity = response['forecast']['forecastday'][2]['day']['avghumidity']
+    day_2_date = response['forecast']['forecastday'][2]['date']
     #print(day_2_maxtemp_f, day_2_mintemp_f, day_2_avgtemp_f,day_2_condition_dict,day_2_avghumidity)
 
     # finally, dicts I can see in my bird brain
@@ -89,13 +91,15 @@ def forecast_api_call() -> dict:
                   'day_1_mintemp_f':day_1_mintemp_f,
                   'day_1_avgtemp_f':day_1_avgtemp_f,
                   'day_1_condition_dict':day_1_condition_dict,
-                  'day_1_avghumidity':day_1_avghumidity}
+                  'day_1_avghumidity':day_1_avghumidity,
+                  'day_1_date':day_1_date}
     
     day_2_dict = {'day_2_maxtemp_f':day_2_maxtemp_f,
                   'day_2_mintemp_f':day_2_mintemp_f,
                   'day_2_avgtemp_f':day_2_avgtemp_f,
                   'day_2_condition_dict':day_2_condition_dict,
-                  'day_2_avghumidity':day_2_avghumidity}
+                  'day_2_avghumidity':day_2_avghumidity,
+                  'day_2_date':day_2_date}
     
     # one dict to rule them all
     formatted_response = {'location_dict':location_dict,
