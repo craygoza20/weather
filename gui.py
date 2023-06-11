@@ -6,41 +6,55 @@ from datetime import datetime
 
 class WeatherApp(ttk.Window):
     def __init__(self):
-        super().__init__(themename='morph')
+        super().__init__(themename='flatly')
         self.title("Weather App")
         self.geometry("1024x768")
         self.resizable(False,False)
-        #self.bg = tk.PhotoImage(file='bg.png')
-        #self.bg_label = ttk.Label(self, image=self.bg)
-        #self.bg_label.place(x=-2,y=-2)
-        self.forecast_response = wx.forecast_api_call()
+        self.get_forecast()
+        self.create_widgets()
+
+
+    def get_forecast(self, query=None):
+
+        if query:
+            self.forecast_response = wx.forecast_api_call(query)
+        else:
+            self.forecast_response = wx.forecast_api_call()
+
         self.image_paths = wx.get_condition_image(self.forecast_response)
         self.location = self.forecast_response['location_dict']['loc_name'] + ', ' + self.forecast_response['location_dict']['loc_region']
         self.current_time = self.forecast_response['location_dict']['loc_time']
         self.current_dict = self.forecast_response['current_dict']
         self.day1_dict = self.forecast_response['day_1_dict']
         self.day2_dict = self.forecast_response['day_2_dict']
-        self.create_widgets()
-
 
     def create_widgets(self):
 
-        self.title_label = ttk.Label(self, text="3-Day Forecast", font=('Arial',48))
-        self.title_label.pack(pady=(180,10))
+        self.bg = tk.PhotoImage(file='bg.png')
+        self.bg_label = ttk.Label(self, image=self.bg)
+        self.bg_label.place(x=-2,y=-2)
+        
+        self.combined_frame = ttk.Frame(self, borderwidth=1, relief='solid')
 
-        self.forecast_frame = ttk.Frame(self, borderwidth=1, relief='solid')
+        self.title_label = ttk.Label(self.combined_frame, text="3-Day Forecast", font=('Calibri',48))
+        self.title_label.pack(pady=(5,5), padx=5)
+        
+        self.forecast_frame = ttk.Frame(self.combined_frame)
         self.create_weather_icons()
         self.attach_forecast_data()
-        self.forecast_frame.pack()
+        self.forecast_frame.pack(padx=5, pady=(5,0))
 
         # I guess I can show more useful data in current conditions?
-        self.conditions_frame = ttk.Frame(self)
+        self.conditions_frame = ttk.Frame(self.combined_frame)
         self.attach_current_data()
         self.conditions_frame.pack()
 
-        self.get_weather_button = ttk.Button(self, text="Debug Weather", command=self.debug_show_forecast_response, padding=30, bootstyle=('INFO', 'OUTLINE'))
-        self.get_weather_button.pack(pady=(50,0))
+        # self.get_weather_button = ttk.Button(self.combined_frame, text="Debug Weather", command=self.debug_show_forecast_response, padding=30, bootstyle=('secondary'))
+        # self.get_weather_button.pack(pady=(25,5))
 
+        self.attach_new_location()
+
+        self.combined_frame.pack(fill='y', pady=(150,0))
 
     def create_weather_icons(self):
         
@@ -65,15 +79,14 @@ class WeatherApp(ttk.Window):
 
     def attach_forecast_data(self):
 
-        # TODO: HOW DO I PARSE THE DATES WTF
+        # TODO: HOW DO I PARSE THE DATES WTF jk fixed it
         self.current_date_formatted = datetime.strptime(self.current_time,'%Y-%m-%d %H:%M')
         self.day1_date_formatted = datetime.strptime(self.day1_dict['day_1_date'][0:10],'%Y-%m-%d')
         self.day2_date_formatted = datetime.strptime(self.day2_dict['day_2_date'][0:10],'%Y-%m-%d')
 
-
-        self.forecast0_date_label = ttk.Label(self.forecast_frame, text=self.current_date_formatted.strftime('%a'), font=('Arial', 14))
-        self.forecast1_date_label = ttk.Label(self.forecast_frame, text=self.day1_date_formatted.strftime('%a'), font=('Arial', 14))
-        self.forecast2_date_label = ttk.Label(self.forecast_frame, text=self.day2_date_formatted.strftime('%a'), font=('Arial', 14))
+        self.forecast0_date_label = ttk.Label(self.forecast_frame, text='Today', font=('Calibri', 14))
+        self.forecast1_date_label = ttk.Label(self.forecast_frame, text=self.day1_date_formatted.strftime('%a'), font=('Calibri', 14))
+        self.forecast2_date_label = ttk.Label(self.forecast_frame, text=self.day2_date_formatted.strftime('%a'), font=('Calibri', 14))
 
         self.condition_text0 = self.current_dict['current_condition_dict']['text']
         self.condition_text1 = self.day1_dict['day_1_condition_dict']['text']
@@ -82,7 +95,6 @@ class WeatherApp(ttk.Window):
         self.temp0 = tk.StringVar(self,self.condition_text0 + ' ' + str(self.current_dict['current_temp_f']) + chr(176) + 'F')
         self.temp1 = tk.StringVar(self,self.condition_text1 + ' ' + str(self.day1_dict['day_1_avgtemp_f']) + chr(176) + 'F')
         self.temp2 = tk.StringVar(self,self.condition_text2 + ' ' + str(self.day2_dict['day_2_avgtemp_f']) + chr(176) + 'F')
-
 
         self.forecast0 = ttk.Label(self.forecast_frame, textvariable=self.temp0)
         self.forecast1 = ttk.Label(self.forecast_frame, textvariable=self.temp1)
@@ -97,16 +109,46 @@ class WeatherApp(ttk.Window):
 
 
     def attach_current_data(self):
-        self.location_label = ttk.Label(self.conditions_frame, text=self.location, font=('Arial',18))
-        self.local_time_label = ttk.Label(self.conditions_frame, text=('Last updated: ' + self.current_time), font=('Arial',18))
+        self.location_label = ttk.Label(self.conditions_frame, text=self.location, font=('Calibri',18))
+        self.local_time_label = ttk.Label(self.conditions_frame, text=('Last updated: ' + self.current_time), font=('Calibri',18))
         self.current_temp_label = ttk.Label(self.conditions_frame, text=(str(self.current_dict['current_temp_f']) + chr(176) + 'F'))
         self.current_sky_label = ttk.Label(self.conditions_frame, text=self.current_dict['current_condition_dict']['text'])
 
         self.location_label.pack(pady=(10,5))
         self.local_time_label.pack(pady=(5,5))
-        self.current_temp_label.pack(pady=(5,5))
-        self.current_sky_label.pack(pady=(5,5))
+        # self.current_temp_label.pack(pady=(5,5))
+        # self.current_sky_label.pack(pady=(5,5))
         
+
+    def attach_new_location(self):
+        # TODO: add entry widget for new location query
+        # ez
+
+        self.new_loc_frame = ttk.Frame(self.combined_frame)
+
+        self.new_loc_label = ttk.Label(self.new_loc_frame, text='Enter new location: ', font=('Calibri'))
+
+        self.new_loc_var = ''
+        self.new_loc_entry = ttk.Entry(self.new_loc_frame)
+        self.new_loc_button = ttk.Button(self.new_loc_frame, text='Get', command=self.get_new_location_data)
+
+        self.new_loc_label.grid(column=0, row=0)
+        self.new_loc_entry.grid(column=1, row=0, padx=5)
+        self.new_loc_button.grid(column=3, row=0)
+        self.new_loc_frame.pack(pady=5)
+
+
+    def get_new_location_data(self):
+        self.new_loc_var = self.new_loc_entry.get()
+        self.get_forecast(self.new_loc_var)
+        self.clear_screen()
+        self.create_widgets()
+        
+ 
+    def clear_screen(self):
+        for widget in self.winfo_children():
+            widget.destroy()
+
 
     def debug_show_forecast_response(self):
         wx.pp.pprint(self.forecast_response)

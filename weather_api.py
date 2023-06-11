@@ -25,13 +25,13 @@ def realtime_api_call() -> dict:
     return response
 
 
-def forecast_api_call() -> dict:
+def forecast_api_call(query='Portland, OR') -> dict:
     """Makes a call to the forecast weather api for my location for 3 days of weather.
     Returns a dict containing location info, current day weather, forecast weather for next 2 days"""
 
     url = "https://weatherapi-com.p.rapidapi.com/forecast.json"
 
-    querystring = {"q":"97201","days":"3"}
+    querystring = {"q":str(query),"days":"3"}
 
     headers = {
         "X-RapidAPI-Key": forecast_apikey,
@@ -133,9 +133,6 @@ def get_condition_image(response_dict:dict) -> list:
 
     return [current_image_path, day1_image_path, day2_image_path]
 
-#realtime_response = realtime_api_call()
-forecast_response = forecast_api_call()
-
 # silly me did not know I would become this evil
 # WHY ARE THERE SO MANY NESTED DICTS 
 # for key,value in forecast_response.items():
@@ -150,3 +147,5 @@ forecast_response = forecast_api_call()
 
 # image_paths = get_condition_image(forecast_response)
 # pp.pprint(image_paths)
+if __name__ == "__main__":
+    forecast_api_call()
