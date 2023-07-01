@@ -1,5 +1,5 @@
 import requests
-from api_keys import realtime_apikey, forecast_apikey
+from api_keys import xrapid_api_key
 import pprint
 import urllib.request
 from PIL import Image
@@ -7,22 +7,19 @@ from PIL import Image
 pp = pprint.PrettyPrinter(compact=True, sort_dicts=False)
 
 
-def realtime_api_call() -> dict:
-    url = "https://weatherapi-com.p.rapidapi.com/current.json"
+def aqi_api_call(lat, lon) -> dict:
+    url = "https://air-quality-by-api-ninjas.p.rapidapi.com/v1/airquality"
 
-    querystring = {"q":"97201"}
+    querystring = {"lat":lat,"lon":lon}
 
     headers = {
-        "X-RapidAPI-Key": realtime_apikey,
-        "X-RapidAPI-Host": "weatherapi-com.p.rapidapi.com"
+        "X-RapidAPI-Key": xrapid_api_key,
+        "X-RapidAPI-Host": "air-quality-by-api-ninjas.p.rapidapi.com"
     }
 
     response = requests.get(url, headers=headers, params=querystring)
 
-    response = dict(response.json())
-    # might be deleted since the forecast api also contains current conditons
-
-    return response
+    print(response.json())
 
 
 def forecast_api_call(query='Portland, OR') -> dict:
@@ -34,7 +31,7 @@ def forecast_api_call(query='Portland, OR') -> dict:
     querystring = {"q":str(query),"days":"3"}
 
     headers = {
-        "X-RapidAPI-Key": forecast_apikey,
+        "X-RapidAPI-Key": xrapid_api_key,
         "X-RapidAPI-Host": "weatherapi-com.p.rapidapi.com"
     }
     
@@ -48,6 +45,8 @@ def forecast_api_call(query='Portland, OR') -> dict:
     loc_name = response['location']['name']
     loc_region = response['location']['region']
     loc_time = response['location']['localtime']
+    loc_lon = response['location']['lon']
+    loc_lat = response['location']['lat']
     #print(loc_name,loc_region,loc_time)
 
     # from current weather I want temp_f, is_day, condition dict, humidity
@@ -80,7 +79,10 @@ def forecast_api_call(query='Portland, OR') -> dict:
     # finally, dicts I can see in my bird brain
     location_dict = {'loc_name':loc_name,
                      'loc_region':loc_region,
-                     'loc_time':loc_time}
+                     'loc_time':loc_time,
+                     'lon':loc_lon,
+                     'lat':loc_lat
+                     }
     
     current_dict =  {'current_temp_f':current_temp_f,
                      'current_is_day':current_is_day,
@@ -133,6 +135,12 @@ def get_condition_image(response_dict:dict) -> list:
 
     return [current_image_path, day1_image_path, day2_image_path]
 
+<<<<<<< Updated upstream
+=======
+
+forecast_response = forecast_api_call()
+
+>>>>>>> Stashed changes
 # silly me did not know I would become this evil
 # WHY ARE THERE SO MANY NESTED DICTS 
 # for key,value in forecast_response.items():
