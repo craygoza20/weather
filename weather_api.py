@@ -7,7 +7,7 @@ from PIL import Image
 pp = pprint.PrettyPrinter(compact=True, sort_dicts=False)
 
 
-def aqi_api_call(lat, lon) -> dict:
+def aqi_api_call(lat, lon):
     url = "https://air-quality-by-api-ninjas.p.rapidapi.com/v1/airquality"
 
     querystring = {"lat":lat,"lon":lon}
@@ -135,12 +135,9 @@ def get_condition_image(response_dict:dict) -> list:
 
     return [current_image_path, day1_image_path, day2_image_path]
 
-<<<<<<< Updated upstream
-=======
 
 forecast_response = forecast_api_call()
 
->>>>>>> Stashed changes
 # silly me did not know I would become this evil
 # WHY ARE THERE SO MANY NESTED DICTS 
 # for key,value in forecast_response.items():
