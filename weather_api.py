@@ -153,4 +153,4 @@ forecast_response = forecast_api_call()
 # image_paths = get_condition_image(forecast_response)
 # pp.pprint(image_paths)
 if __name__ == "__main__":
-    forecast_api_call()
+    print(forecast_api_call())
