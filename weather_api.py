@@ -18,8 +18,9 @@ def aqi_api_call(lat, lon):
     }
 
     response = requests.get(url, headers=headers, params=querystring)
+    response = dict(response.json())
 
-    print(response.json())
+    return response['overall_aqi']
 
 
 def forecast_api_call(query='Portland, OR') -> dict:
@@ -136,7 +137,7 @@ def get_condition_image(response_dict:dict) -> list:
     return [current_image_path, day1_image_path, day2_image_path]
 
 
-forecast_response = forecast_api_call()
+
 
 # silly me did not know I would become this evil
 # WHY ARE THERE SO MANY NESTED DICTS 
@@ -153,4 +154,7 @@ forecast_response = forecast_api_call()
 # image_paths = get_condition_image(forecast_response)
 # pp.pprint(image_paths)
 if __name__ == "__main__":
-    print(forecast_api_call())
+    forecast_response = forecast_api_call()
+    #print(forecast_response)
+    aqi = aqi_api_call(forecast_response['location_dict']['lat'], forecast_response['location_dict']['lon'])
+    print(aqi)

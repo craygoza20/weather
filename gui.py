@@ -18,8 +18,14 @@ class WeatherApp(ttk.Window):
 
         if query:
             self.forecast_response = wx.forecast_api_call(query)
+            self.lat = self.forecast_response['location_dict']['lat']
+            self.lon = self.forecast_response['location_dict']['lon']
+            self.aqi = wx.aqi_api_call(self.lat, self.lon)
         else:
             self.forecast_response = wx.forecast_api_call()
+            self.lat = self.forecast_response['location_dict']['lat']
+            self.lon = self.forecast_response['location_dict']['lon']
+            self.aqi = wx.aqi_api_call(self.lat, self.lon)
 
         self.image_paths = wx.get_condition_image(self.forecast_response)
         self.location = self.forecast_response['location_dict']['loc_name'] + ', ' + self.forecast_response['location_dict']['loc_region']
@@ -111,10 +117,12 @@ class WeatherApp(ttk.Window):
     def attach_current_data(self):
         self.location_label = ttk.Label(self.conditions_frame, text=self.location, font=('Calibri',18))
         self.local_time_label = ttk.Label(self.conditions_frame, text=('Last updated: ' + self.current_time), font=('Calibri',18))
-        self.current_temp_label = ttk.Label(self.conditions_frame, text=(str(self.current_dict['current_temp_f']) + chr(176) + 'F'))
-        self.current_sky_label = ttk.Label(self.conditions_frame, text=self.current_dict['current_condition_dict']['text'])
-
-        self.location_label.pack(pady=(10,5))
+        #self.current_temp_label = ttk.Label(self.conditions_frame, text=(str(self.current_dict['current_temp_f']) + chr(176) + 'F'))
+        #self.current_sky_label = ttk.Label(self.conditions_frame, text=self.current_dict['current_condition_dict']['text'])
+        # TODO: implement aqi meter using discrete colors table from airnow.gov
+        self.aqi_label = ttk.Label(self.conditions_frame, text='Current AQI: ' + str(self.aqi), font=('Calibri',18))
+        self.aqi_label.pack(pady=(10,5))
+        self.location_label.pack(pady=(5,5))
         self.local_time_label.pack(pady=(5,5))
         # self.current_temp_label.pack(pady=(5,5))
         # self.current_sky_label.pack(pady=(5,5))
