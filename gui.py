@@ -1,7 +1,7 @@
 import tkinter as tk
 import ttkbootstrap as ttk
 import weather_api as wx
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageFilter
 from datetime import datetime
 
 class WeatherApp(ttk.Window):
@@ -60,24 +60,24 @@ class WeatherApp(ttk.Window):
 
         self.attach_new_location()
 
-        self.combined_frame.pack(fill='y', pady=(150,0))
+        self.combined_frame.pack(fill='y', pady=(30,0))
 
     def create_weather_icons(self):
         
-        self.forecast0_image = Image.open(self.image_paths[0])
-        self.forecast0_image= self.forecast0_image.resize((128,128), Image.LANCZOS)
+        self.forecast0_image = Image.open(self.image_paths[0]).convert(mode="RGBA")
+        self.forecast0_image= self.forecast0_image.resize((128,128), Image.Resampling.LANCZOS).filter(ImageFilter.DETAIL)
         self.display0 = ImageTk.PhotoImage(self.forecast0_image)
         self.forecast0_image_label = ttk.Label(self.forecast_frame, image=self.display0)
         self.forecast0_image_label.grid(column=0, row=1, padx=5, pady=(5,1))
 
-        self.forecast1_image = Image.open(self.image_paths[1])
-        self.forecast1_image= self.forecast1_image.resize((128,128), Image.LANCZOS)
+        self.forecast1_image = Image.open(self.image_paths[1]).convert(mode="RGBA")
+        self.forecast1_image= self.forecast1_image.resize((128,128), Image.Resampling.LANCZOS).filter(ImageFilter.DETAIL)
         self.display1 = ImageTk.PhotoImage(self.forecast1_image)
         self.forecast1_image_label = ttk.Label(self.forecast_frame, image=self.display1)
         self.forecast1_image_label.grid(column=1, row=1, padx=5, pady=(5,1))
 
-        self.forecast2_image = Image.open(self.image_paths[2])
-        self.forecast2_image= self.forecast2_image.resize((128,128), Image.LANCZOS)
+        self.forecast2_image = Image.open(self.image_paths[2]).convert(mode="RGBA")
+        self.forecast2_image= self.forecast2_image.resize((128,128), Image.Resampling.LANCZOS).filter(ImageFilter.DETAIL)
         self.display2 = ImageTk.PhotoImage(self.forecast2_image)
         self.forecast2_image_label = ttk.Label(self.forecast_frame, image=self.display2)
         self.forecast2_image_label.grid(column=2, row=1, padx=5, pady=(5,1))
@@ -109,9 +109,9 @@ class WeatherApp(ttk.Window):
         self.forecast0_date_label.grid(column=0, row=0, pady=(1,5))
         self.forecast1_date_label.grid(column=1, row=0, pady=(1,5))
         self.forecast2_date_label.grid(column=2, row=0, pady=(1,5))
-        self.forecast0.grid(column=0, row=2, pady=(1,10))
-        self.forecast1.grid(column=1, row=2, pady=(1,10))
-        self.forecast2.grid(column=2, row=2, pady=(1,10))
+        self.forecast0.grid(column=0, row=2, pady=(1,10), padx=5)
+        self.forecast1.grid(column=1, row=2, pady=(1,10), padx=5)
+        self.forecast2.grid(column=2, row=2, pady=(1,10), padx=5)
 
 
     def attach_current_data(self):
@@ -120,8 +120,31 @@ class WeatherApp(ttk.Window):
         #self.current_temp_label = ttk.Label(self.conditions_frame, text=(str(self.current_dict['current_temp_f']) + chr(176) + 'F'))
         #self.current_sky_label = ttk.Label(self.conditions_frame, text=self.current_dict['current_condition_dict']['text'])
         # TODO: implement aqi meter using discrete colors table from airnow.gov
-        self.aqi_label = ttk.Label(self.conditions_frame, text='Current AQI: ' + str(self.aqi), font=('Calibri',18))
-        self.aqi_label.pack(pady=(10,5))
+        self.meter = ttk.Meter(self.conditions_frame,
+            metersize=130,
+            padding=5,
+            amountused=0,
+            metertype="semi",
+            subtext="AQI",
+            interactive=False,
+            amounttotal=500,
+            stripethickness=3
+        )
+        self.meter.pack()
+
+        # update the amount used directly
+        # why can I not change the color of the bar directly TTKBOOTSTRAP??? >:(
+        self.meter.configure(amountused=self.aqi)
+        if self.meter.amountusedvar.get() < 50:
+            self.meter.configure(bootstyle='success')
+        elif self.meter.amountusedvar.get() < 100:
+            self.meter.configure(bootstyle='warning')
+        elif self.meter.amountusedvar.get() >= 500:
+            self.meter.configure(bootstyle='danger', textright='+')
+        else:
+            self.meter.configure(bootstyle='danger')
+        #self.aqi_label = ttk.Label(self.conditions_frame, text='Current AQI: ' + str(self.aqi), font=('Calibri',18))
+        #self.aqi_label.pack(pady=(10,5))
         self.location_label.pack(pady=(5,5))
         self.local_time_label.pack(pady=(5,5))
         # self.current_temp_label.pack(pady=(5,5))

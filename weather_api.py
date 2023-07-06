@@ -158,3 +158,7 @@ if __name__ == "__main__":
     #print(forecast_response)
     aqi = aqi_api_call(forecast_response['location_dict']['lat'], forecast_response['location_dict']['lon'])
     print(aqi)
+
+    for image in get_condition_image(forecast_response):
+        with Image.open(image) as im:
+            print(im.getbands())  # Returns ('R', 'G', 'B'
